@@ -37,7 +37,7 @@ export default function Component() {
     try {
       const completion = await openai.chat.completions.create({
         model: "qwen-plus",
-        messages: messages, // 直接使用原始 messages 数组
+        messages: messages.map(msg => ({ ...msg, name: undefined })), // 添加 name 属性
         stream: true,
       });
 
