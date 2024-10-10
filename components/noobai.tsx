@@ -9,13 +9,43 @@ export default function Component() {
   const [output, setOutput] = useState('')
   const [isThinking, setIsThinking] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsThinking(true)
-    setTimeout(() => {
-      setOutput(`这是一个荒诞的回答：${input.split('').reverse().join('')}`)
-      setIsThinking(false)
-    }, 1500)
+    setOutput('') // 清空之前的输出
+    const messages = [
+      { role: 'system', content: '你是一个有用的助手' },
+      { role: 'user', content: input }
+    ]
+    
+    const response = await fetch(process.env.ALICLOUD_API_ENDPOINT, { // 使用环境变量中的 API 端点
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.DASHSCOPE_API_KEY}` // 使用环境变量中的 API Key
+      },
+      body: JSON.stringify({
+        model: "qwen-plus",
+        messages: messages,
+        result_format: 'message',
+        stream: true,
+        incremental_output: true
+      })
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let done = false;
+
+    while (!done) {
+      const { done: doneReading, value } = await reader.read();
+      done = doneReading;
+      if (value) {
+        const chunk = decoder.decode(value, { stream: true });
+        setOutput(prev => prev + chunk); // 逐步更新输出
+      }
+    }
+    setIsThinking(false);
   }
 
   return (
