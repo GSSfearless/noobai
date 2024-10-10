@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
 import { TextDecoder } from 'util' // 添加此行以导入 TextDecoder
+import dashscope from 'dashscope' // 添加此行以导入 dashscope
 
 export default function Component() {
   const [input, setInput] = useState('')
@@ -20,51 +21,27 @@ export default function Component() {
     ]
 
     // 检查环境变量是否定义
-    const apiEndpoint = process.env.ALICLOUD_API_ENDPOINT
-    const apiKey = process.env.DASHSCOPE_API_KEY
+    const apiKey = process.env.DASHSCOPE_API_KEY // 只保留 API 密钥的检查
 
-    if (!apiEndpoint || !apiKey) {
-      console.error('API endpoint or API key is not defined.')
-      setOutput('API 端点或 API 密钥未定义，请检查配置。')
+    if (!apiKey) {
+      console.error('API key is not defined.')
+      setOutput('API 密钥未定义，请检查配置。')
       setIsThinking(false)
       return
     }
 
     try {
-      const response = await fetch(apiEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: "qwen-plus",
-          messages: messages,
-          result_format: 'message',
-          stream: true,
-          incremental_output: true
-        })
+      const responses = await dashscope.Generation.call({
+        api_key: apiKey, // 使用 API 密钥
+        model: "qwen-plus",
+        messages: messages,
+        result_format: 'message',
+        stream: true,
+        incremental_output: true
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      if (response.body) {
-        const reader = response.body.getReader()
-        const decoder = new TextDecoder() // 确保 TextDecoder 被正确导入
-        let done = false
-
-        while (!done) {
-          const { done: doneReading, value } = await reader.read()
-          done = doneReading
-          if (value) {
-            const chunk = decoder.decode(value, { stream: true })
-            setOutput(prev => prev + chunk) // 逐步更新输出
-          }
-        }
-      } else {
-        // 处理 response.body 为 null 的情况
+      for (const response of responses) {
+        setOutput(prev => prev + response) // 逐步更新输出
       }
 
       setIsThinking(false)
