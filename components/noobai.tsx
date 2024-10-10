@@ -54,20 +54,22 @@ export default function Component() {
         const reader = response.body.getReader()
         const decoder = new TextDecoder() // 确保 TextDecoder 被正确导入
         let done = false
-
-        while (!done) {
-          const { done: doneReading, value } = await reader.read()
-          done = doneReading
-          if (value) {
-            const chunk = decoder.decode(value, { stream: true })
-            setOutput(prev => prev + chunk) // 逐步更新输出
-          }
-        }
       } else {
         // 处理 response.body 为 null 的情况
       }
 
-      setIsThinking(false)
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let done = false
+
+      while (!done) {
+        const { done: doneReading, value } = await reader.read()
+        done = doneReading
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true })
+          setOutput(prev => prev + chunk) // 逐步更新输出
+        }
+      }
     } catch (error) {
       console.error('Error fetching data:', error)
       setOutput('发生错误，请重试。') // 显示错误信息
