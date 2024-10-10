@@ -20,8 +20,8 @@ export default function Component() {
     setIsThinking(true)
     setOutput('') // 清空之前的输出
     const messages = [
-      { role: 'system', content: '你是一个有用的助手' },
-      { role: 'user', content: input }
+      { role: 'system', content: '你是一个有用的助手', name: 'system' }, // 添加 name 属性
+      { role: 'user', content: input, name: 'user' } // 添加 name 属性
     ]
 
     // 检查环境变量是否定义
