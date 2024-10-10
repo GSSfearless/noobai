@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
+import { TextDecoder } from 'util' // 添加此行以导入 TextDecoder
 
 export default function Component() {
   const [input, setInput] = useState('')
@@ -17,35 +18,64 @@ export default function Component() {
       { role: 'system', content: '你是一个有用的助手' },
       { role: 'user', content: input }
     ]
-    
-    const response = await fetch(process.env.ALICLOUD_API_ENDPOINT, { // 使用环境变量中的 API 端点
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.DASHSCOPE_API_KEY}` // 使用环境变量中的 API Key
-      },
-      body: JSON.stringify({
-        model: "qwen-plus",
-        messages: messages,
-        result_format: 'message',
-        stream: true,
-        incremental_output: true
-      })
-    });
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
+    // 检查环境变量是否定义
+    const apiEndpoint = process.env.ALICLOUD_API_ENDPOINT
+    const apiKey = process.env.DASHSCOPE_API_KEY
 
-    while (!done) {
-      const { done: doneReading, value } = await reader.read();
-      done = doneReading;
-      if (value) {
-        const chunk = decoder.decode(value, { stream: true });
-        setOutput(prev => prev + chunk); // 逐步更新输出
-      }
+    if (!apiEndpoint || !apiKey) {
+      console.error('API endpoint or API key is not defined.')
+      setOutput('API 端点或 API 密钥未定义，请检查配置。')
+      setIsThinking(false)
+      return
     }
-    setIsThinking(false);
+
+    try {
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "qwen-plus",
+          messages: messages,
+          result_format: 'message',
+          stream: true,
+          incremental_output: true
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      if (response.body) {
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder() // 确保 TextDecoder 被正确导入
+        let done = false
+      } else {
+        // 处理 response.body 为 null 的情况
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let done = false
+
+      while (!done) {
+        const { done: doneReading, value } = await reader.read()
+        done = doneReading
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true })
+          setOutput(prev => prev + chunk) // 逐步更新输出
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      setOutput('发生错误，请重试。') // 显示错误信息
+    } finally {
+      setIsThinking(false)
+    }
   }
 
   return (
