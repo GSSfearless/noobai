@@ -3,8 +3,8 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
-import { TextDecoder } from 'util' // 确保这里没有使用 node: 前缀
-import * as dashscope from 'dashscope' // 使用命名导入
+import { TextDecoder } from 'util' // 添加此行以导入 TextDecoder
+import dashscope from 'dashscope' // 添加此行以导入 dashscope
 
 export default function Component() {
   const [input, setInput] = useState('')
