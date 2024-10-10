@@ -3,12 +3,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
-import OpenAI from "openai"; // 添加 OpenAI 导入
-
-const openai = new OpenAI({
-    apiKey: process.env.DASHSCOPE_API_KEY, // 使用环境变量中的 API 密钥
-    baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1" // 设置基础 URL
-});
+import { TextDecoder } from 'util' // 添加此行以导入 TextDecoder
 
 export default function Component() {
   const [input, setInput] = useState('')
@@ -25,25 +20,51 @@ export default function Component() {
     ]
 
     // 检查环境变量是否定义
+    const apiEndpoint = process.env.ALICLOUD_API_ENDPOINT
     const apiKey = process.env.DASHSCOPE_API_KEY
 
-    if (!apiKey) {
-      console.error('API key is not defined.')
-      setOutput('API 密钥未定义，请检查配置。')
+    if (!apiEndpoint || !apiKey) {
+      console.error('API endpoint or API key is not defined.')
+      setOutput('API 端点或 API 密钥未定义，请检查配置。')
       setIsThinking(false)
       return
     }
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: "qwen-plus",
-        messages: messages,
-        stream: true,
-      });
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "qwen-plus",
+          messages: messages,
+          result_format: 'message',
+          stream: true,
+          incremental_output: true
+        })
+      })
 
-      for await (const chunk of completion) {
-        const chunkString = JSON.stringify(chunk); // 将 chunk 转换为字符串
-        setOutput(prev => prev + chunkString); // 逐步更新输出
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      if (response.body) {
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder() // 确保 TextDecoder 被正确导入
+        let done = false
+
+        while (!done) {
+          const { done: doneReading, value } = await reader.read()
+          done = doneReading
+          if (value) {
+            const chunk = decoder.decode(value, { stream: true })
+            setOutput(prev => prev + chunk) // 逐步更新输出
+          }
+        }
+      } else {
+        // 处理 response.body 为 null 的情况
       }
 
       setIsThinking(false)
