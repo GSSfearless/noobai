@@ -9,7 +9,7 @@ export default function Component() {
   const [output, setOutput] = useState('')
   const [isThinking, setIsThinking] = useState(false)
   const [batteryLevel, setBatteryLevel] = useState(100)
-  const [glitchLevel, setGlitchLevel] = useState(0)
+  // const [glitchLevel, setGlitchLevel] = useState(0) // 删除未使用的状态
   const [clickCount, setClickCount] = useState(0)
   const [isCharging, setIsCharging] = useState(false)
   const robotAnimation = useAnimation()
@@ -18,7 +18,7 @@ export default function Component() {
   useEffect(() => {
     const interval = setInterval(() => {
       setBatteryLevel(prev => Math.max(0, prev - 1))
-      setGlitchLevel(prev => Math.min(100, prev + 0.5))
+      // setGlitchLevel(prev => Math.min(100, prev + 0.5)) // 删除未使用的状态更新
     }, 1000)
 
     // Animate eyes randomly
