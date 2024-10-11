@@ -36,7 +36,7 @@ export default function Component() {
     }
   }, [eyeAnimation])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (batteryLevel < 10) {
       setOutput("电量不足...无法思考...需要充电...")
@@ -44,21 +44,28 @@ export default function Component() {
     }
     setIsThinking(true)
     setBatteryLevel(prev => Math.max(0, prev - 10))
-    setTimeout(() => {
-      const forgetfulness = Math.random()
-      let response
-      if (batteryLevel < 30) {
-        response = "电量不足...记忆模糊...无法准确回答..."
-      } else if (forgetfulness < 0.3) {
-        response = "呃...我忘记了你问了什么。这个星球真孤独啊..."
-      } else if (forgetfulness < 0.6) {
-        response = `哦，对了！你问的是"${input.split('').reverse().join('')}"，对吧？`
-      } else {
-        response = `我想起来了！答案是${Math.floor(Math.random() * 100)}！等等，这是对的吗？`
+    
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: input, batteryLevel }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('API请求失败');
       }
-      setOutput(response)
-      setIsThinking(false)
-    }, 2000)
+      
+      const data = await response.json();
+      setOutput(data.response);
+    } catch (error) {
+      console.error('Error:', error);
+      setOutput("哎呀，我的处理器好像出了点问题...能再问一次吗？");
+    } finally {
+      setIsThinking(false);
+    }
   }
 
   const handleRobotClick = () => {
