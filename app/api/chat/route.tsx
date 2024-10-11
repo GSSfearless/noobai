@@ -18,7 +18,6 @@ export async function POST(request: Request) {
       model: "gpt-3.5-turbo", // 可以更改为其他模型
       messages: messages,
       temperature: 0.7, // 控制生成文本的随机性
-      max_tokens: 150, // 限制生成的最大 token 数量
       top_p: 1, // 核采样参数
       frequency_penalty: 1.5, // 提高对重复内容的惩罚
       presence_penalty: 0, // 对新主题的惩罚
