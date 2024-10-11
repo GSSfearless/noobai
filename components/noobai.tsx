@@ -219,7 +219,7 @@ export default function Component() {
             ) : (
               <Sparkles className="w-5 h-5 mr-2" />
             )}
-            {isThinking ? "思考中..." : "大师思考中"}
+            {isThinking ? "大师思考中..." : "请教大师"}
           </button>
         </form>
         <div className="bg-gray-700 bg-opacity-50 rounded-md p-4 min-h-[100px] relative">
