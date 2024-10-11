@@ -37,14 +37,14 @@ export default function Component() {
   }, [eyeAnimation])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (batteryLevel < 10) {
-      setOutput("电量不足...无法思考...需要充电...")
-      return
+      setOutput("电量不足...无法思考...需要充电...");
+      return;
     }
-    setIsThinking(true)
-    setBatteryLevel(prev => Math.max(0, prev - 10))
-    
+    setIsThinking(true);
+    setBatteryLevel(prev => Math.max(0, prev - 10));
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -53,15 +53,15 @@ export default function Component() {
         },
         body: JSON.stringify({ message: input, batteryLevel }),
       });
-      
+
       if (!response.ok) {
-        throw new Error('API请求失败');
+        throw new Error(`API请求失败，状态码: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setOutput(data.response);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error:', error.message);
       setOutput("哎呀，我的处理器好像出了点问题...能再问一次吗？");
     } finally {
       setIsThinking(false);
