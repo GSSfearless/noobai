@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     messages.unshift(rolePrompt); // 将角色提示词添加到消息数组的开头
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: messages,
     })
 
