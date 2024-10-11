@@ -171,7 +171,7 @@ export default function Component() {
               />
             )}
           </motion.div>
-          <h1 className="text-3xl font-bold text-center text-yellow-300">人工智障</h1>
+          <h1 className="text-3xl font-bold text-center text-yellow-300">迷糊的AI</h1>
           <div className="flex items-center space-x-2">
             <Battery className={`w-6 h-6 ${batteryLevel > 50 ? 'text-green-400' : batteryLevel > 20 ? 'text-yellow-400' : 'text-red-400'}`} />
             <span className="text-white">{batteryLevel}%</span>
