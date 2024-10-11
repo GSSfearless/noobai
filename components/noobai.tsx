@@ -61,7 +61,12 @@ export default function Component() {
       const data = await response.json();
       setOutput(data.response);
     } catch (error) {
-      console.error('Error:', error.message);
+      // 使用类型断言来确保 error 是 Error 类型
+      if (error instanceof Error) {
+        console.error('Error:', error.message);
+      } else {
+        console.error('Error:', error); // 处理未知类型的错误
+      }
       setOutput("哎呀，我的处理器好像出了点问题...能再问一次吗？");
     } finally {
       setIsThinking(false);
