@@ -46,12 +46,19 @@ export default function Component() {
     setBatteryLevel(prev => Math.max(0, prev - 10));
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/chat/completions', { // 更新API请求的URL
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, // 添加Authorization头
         },
-        body: JSON.stringify({ message: input, batteryLevel }),
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo", // 指定模型
+          messages: [
+            { role: "system", content: "You are a helpful assistant." },
+            { role: "user", content: input } // 使用用户输入
+          ]
+        }),
       });
 
       if (!response.ok) {
