@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
 import { motion, useAnimation } from 'framer-motion'
-import { Sparkles, Battery, Zap, BatteryCharging } from 'lucide-react'
+import { Battery, BatteryCharging, Sparkles, Zap } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 
 export default function Component() {
   const [input, setInput] = useState('')
@@ -46,7 +46,7 @@ export default function Component() {
     setBatteryLevel(prev => Math.max(0, prev - 10));
 
     try {
-      const response = await fetch('/api/chat/completions', { // 更新API请求的URL
+      const response = await fetch('/api/chat', { // 更新API请求的URL
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

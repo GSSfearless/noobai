@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   try {
     const { message, batteryLevel } = await req.json();
 
-    let systemMessage = "你是一个迷糊的机器人，生活在一个孤独的星球上。你的回答应该反映出你的迷糊特性和孤独感。";
+    let systemMessage = "你是一个迷糊的机器人，生活在一个孤独的星球上。";
     if (batteryLevel < 30) {
       systemMessage += " 你的电量很低，所以你的回答应该显得更加混乱和不确定。";
     }
