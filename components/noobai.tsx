@@ -171,7 +171,7 @@ export default function Component() {
               />
             )}
           </motion.div>
-          <h1 className="text-3xl font-bold text-center text-yellow-300">迷糊的AI</h1>
+          <h1 className="text-3xl font-bold text-center text-yellow-300">大师</h1>
           <div className="flex items-center space-x-2">
             <Battery className={`w-6 h-6 ${batteryLevel > 50 ? 'text-green-400' : batteryLevel > 20 ? 'text-yellow-400' : 'text-red-400'}`} />
             <span className="text-white">{batteryLevel}%</span>
@@ -219,7 +219,7 @@ export default function Component() {
             ) : (
               <Sparkles className="w-5 h-5 mr-2" />
             )}
-            {isThinking ? "思考中..." : "获取迷糊回答"}
+            {isThinking ? "思考中..." : "大师思考中"}
           </button>
         </form>
         <div className="bg-gray-700 bg-opacity-50 rounded-md p-4 min-h-[100px] relative">
