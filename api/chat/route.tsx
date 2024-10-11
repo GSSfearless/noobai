@@ -1,31 +1,25 @@
-import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { NextResponse } from 'next/server'
+import OpenAI from 'openai'
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+  apiKey: process.env.OPENAI_API_KEY
+})
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { message, batteryLevel } = await req.json();
+    const body = await request.json()
+    const { messages } = body
 
-    let systemMessage = "你是一个迷糊的机器人，生活在一个孤独的星球上。";
-    if (batteryLevel < 30) {
-      systemMessage += " 你的电量很低，所以你的回答应该显得更加混乱和不确定。";
-    }
-
-    const response = await openai.chat.completions.create({
+    const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: systemMessage },
-        { role: "user", content: message }
-      ],
-      max_tokens: 150,
-    });
+      messages: messages,
+    })
 
-    return NextResponse.json({ response: response.choices[0].message.content });
+    const response = completion.choices[0].message.content
+
+    return NextResponse.json({ response })
   } catch (error) {
-    console.error('OpenAI API error:', error);
-    return NextResponse.json({ error: "无法获取回答。" }, { status: 500 });
+    console.error('Error:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
