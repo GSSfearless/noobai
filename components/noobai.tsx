@@ -3,6 +3,7 @@
 import { motion, useAnimation } from 'framer-motion'
 import { Battery, BatteryCharging, Sparkles, Zap } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import { Analytics } from "@vercel/analytics/react" // 导入Analytics组件
 
 export default function Component() {
   const [input, setInput] = useState('')
@@ -251,6 +252,7 @@ export default function Component() {
            "孤独星球的日子还在继续..."}
         </motion.div>
       </motion.div>
+      <Analytics /> {/* 添加Analytics组件 */}
     </div>
   )
 }
